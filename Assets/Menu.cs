@@ -42,8 +42,6 @@ public class Menu : MonoBehaviour
 
         EditorGUILayout.Separator();
 
-        // TODO: IL
-
         if (GUILayout.Button("Avoid async void"))
         {
             Example_AvoidAsyncVoid();
