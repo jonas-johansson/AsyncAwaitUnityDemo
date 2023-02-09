@@ -440,7 +440,6 @@ public class Menu : MonoBehaviour
 
         DoSomethingAsync().ContinueWith(task =>
         {
-            // But this will run on a different thread.
             // You CAN access Unity from here.
             ThreadIdLogger.Log("After ContinueWith");
         }, TaskScheduler.FromCurrentSynchronizationContext());
