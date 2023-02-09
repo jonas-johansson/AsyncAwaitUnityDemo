@@ -9,6 +9,18 @@ class Backend
         await RandomDelay.Wait();
         return RandomColor.Next();
     }
+
+    public static async Task BuyProductViaRestApiAsync(string productId)
+    {
+        Debug.Log($"Attempting to buy {productId}...");
+        await Task.Delay(2000);
+
+        // Pretend that there's an exception when attempting to buy an orange.
+        if (productId.Contains("Orange"))
+            throw new BackendException();
+
+        Debug.Log($"Successfully bought {productId}");
+    }
 }
 
 class BackendWithGrandpaCallbacks

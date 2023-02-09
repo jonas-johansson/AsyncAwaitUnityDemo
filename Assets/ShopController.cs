@@ -25,10 +25,10 @@ public class ShopController : MonoBehaviour
     void CreateProductCard(ProductModel product)
     {
         var productCard = Instantiate(productCardPrefab, productCardGridLayoutGroup.transform);
-        productCard.Init(product, () => BuyProductAsync(product));
+        productCard.Init(product, () => BuyButtonClickedAsync(product));
     }
 
-    static async Task BuyProductAsync(ProductModel product)
+    static async Task BuyButtonClickedAsync(ProductModel product)
     {
         try
         {

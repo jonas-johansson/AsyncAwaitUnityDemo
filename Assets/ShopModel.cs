@@ -30,14 +30,7 @@ public class ShopModel
 
     public static async Task BuyProductAsync(ProductModel product)
     {
-        Debug.Log($"Attempting to buy {product.Title}...");
-        await Task.Delay(2000);
-
-        // Pretend that there's an exception when attempting to buy an orange.
-        if (product.Title.Contains("Orange"))
-            throw new BackendException();
-
-        Debug.Log($"Successfully bought {product.Title}");
+        await Backend.BuyProductViaRestApiAsync(product.ProductId);
         product.IsOwned = true;
     }
 }

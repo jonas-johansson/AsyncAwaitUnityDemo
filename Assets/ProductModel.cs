@@ -15,6 +15,8 @@ public class ProductModel
         }
     }
 
+    public string ProductId => Title;
+
     public event Action<ProductModel> Changed;
     protected void OnChanged() => Changed?.Invoke(this);
     bool isOwned;
