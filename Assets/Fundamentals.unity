@@ -152,6 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af625f7aee8b4c3408f6d8102d4ade13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  zoom: 1.5
+  spinningCube: {fileID: 3670373810530765848}
 --- !u!4 &1529527107
 Transform:
   m_ObjectHideFlags: 0
@@ -359,12 +361,12 @@ GameObject:
   - component: {fileID: 4903326756039661507}
   - component: {fileID: 8310183827351882837}
   m_Layer: 0
-  m_Name: AnimatedCube
+  m_Name: SpinningCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4080002496322560704
 Transform:
   m_ObjectHideFlags: 0

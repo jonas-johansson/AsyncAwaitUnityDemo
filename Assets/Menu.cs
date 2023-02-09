@@ -12,15 +12,25 @@ using Debug = UnityEngine.Debug;
 
 public class Menu : MonoBehaviour
 {
+    [SerializeField] float zoom = 1.5f;
+    [SerializeField] GameObject spinningCube;
+
     CancellationTokenSource cancellationTokenSource;
 
     void OnGUI()
     {
-        GUI.matrix = Matrix4x4.Scale(new Vector3(2f, 2f, 2f));
+        GUI.matrix = Matrix4x4.Scale(new Vector3(zoom, zoom, zoom));
 
         if (GUILayout.Button("Hello world"))
         {
             Example_HelloWorldAsync();
+        }
+
+        EditorGUILayout.Separator();
+
+        if (GUILayout.Button("Toggle spinning cube"))
+        {
+            spinningCube.SetActive(!spinningCube.activeSelf);
         }
 
         EditorGUILayout.Separator();
@@ -35,9 +45,9 @@ public class Menu : MonoBehaviour
             Example_PrepareSceneAsync();
         }
 
-        if (GUILayout.Button("Prepare scene async and start all before await"))
+        if (GUILayout.Button("Prepare scene async in parallel"))
         {
-            Example_PrepareSceneAsyncStartAllBeforeAwait();
+            Example_PrepareSceneAsyncParallel();
         }
 
         EditorGUILayout.Separator();
@@ -60,6 +70,11 @@ public class Menu : MonoBehaviour
         if (GUILayout.Button("ContinueWith"))
         {
             Example_ContinueWith();
+        }
+
+        if (GUILayout.Button("ContinueWith + SynchronizationContext"))
+        {
+            Example_ContinueWithTaskSchedulerFromSynchronizationContext();
         }
 
         EditorGUILayout.Separator();
@@ -110,41 +125,107 @@ public class Menu : MonoBehaviour
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /// <summary>
+    /// A simple example of what asynchronous code looks like.
+    /// </summary>
+    async Task Example_HelloWorldAsync()
+    {
+        Debug.Log("Hello");
+        await Task.Delay(TimeSpan.FromSeconds(1));
+        Debug.Log("World");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     void Example_PrepareScene()
     {
         var sw = Stopwatch.StartNew();
 
-        var a = LoadCharacter("A");
-        var b = LoadCharacter("B");
-        var c = LoadCharacter("C");
+        var charA = LoadCharacter("A");
+        var charB = LoadCharacter("B");
+        var charC = LoadCharacter("C");
 
         var color = FetchColorFromBackend();
 
-        a.SetColor(color);
-        b.SetColor(color);
-        c.SetColor(color);
+        charA.SetColor(color);
+        charB.SetColor(color);
+        charC.SetColor(color);
 
-        Debug.Log($"{nameof(Example_PrepareScene)} took {sw.ElapsedMilliseconds} ms");
+        Debug.Log($"It took {sw.ElapsedMilliseconds} ms to prepare the scene.");
     }
 
-    async void Example_PrepareSceneAsync()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async Task Example_PrepareSceneAsync()
     {
         var sw = Stopwatch.StartNew();
 
-        var a = await LoadCharacterAsync("A");
-        var b = await LoadCharacterAsync("B");
-        var c = await LoadCharacterAsync("C");
+        var charA = await LoadCharacterAsync("A");
+        var charB = await LoadCharacterAsync("B");
+        var charC = await LoadCharacterAsync("C");
 
         var color = await FetchColorFromBackendAsync();
 
-        a.SetColor(color);
-        b.SetColor(color);
-        c.SetColor(color);
+        charA.SetColor(color);
+        charB.SetColor(color);
+        charC.SetColor(color);
 
-        Debug.Log($"{nameof(Example_PrepareSceneAsync)} took {sw.ElapsedMilliseconds} ms");
+        Debug.Log($"It took {sw.ElapsedMilliseconds} ms to prepare the scene asynchronusly.");
     }
 
-    async void Example_PrepareSceneAsyncStartAllBeforeAwait()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async Task Example_PrepareSceneAsyncParallel()
     {
         var sw = Stopwatch.StartNew();
 
@@ -164,48 +245,33 @@ public class Menu : MonoBehaviour
         b.SetColor(color);
         c.SetColor(color);
 
-        Debug.Log($"{nameof(Example_PrepareSceneAsyncStartAllBeforeAwait)} took {sw.ElapsedMilliseconds} ms");
+        Debug.Log($"It took {sw.ElapsedMilliseconds} ms to prepare the scene async in parallel.");
     }
 
-    async Task<Color> FetchColorFromBackendAsync()
-    {
-        await Task.Delay(TimeSpan.FromSeconds(1));
-        return Color.green;
-    }
 
-    async Task<Character> LoadCharacterAsync(string type)
-    {
-        await Task.Delay(TimeSpan.FromSeconds(1));
-        return new Character(type);
-    }
 
-    /// <summary>
-    /// Fetch color from backend, takes 1 second.
-    /// </summary>
-    Color FetchColorFromBackend()
-    {
-        Thread.Sleep(1000);
-        return Color.green;
-    }
 
-    /// <summary>
-    /// Load a character, takes 1 second.
-    /// </summary>
-    Character LoadCharacter(string type)
-    {
-        Thread.Sleep(1000);
-        return new Character(type);
-    }
 
-    /// <summary>
-    /// A simple example of what asynchronous code looks like.
-    /// </summary>
-    async void Example_HelloWorldAsync()
-    {
-        Debug.Log("Hello");
-        await Task.Delay(TimeSpan.FromSeconds(1));
-        Debug.Log("World");
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /// <summary>
     /// In this example, `AsyncVoidThatThrows` is an async void method that throws an exception.
@@ -227,15 +293,38 @@ public class Menu : MonoBehaviour
         }
         catch (Exception)
         {
-            // We'll never get here.
-            Debug.Log("Caught it");
+            Debug.Log("If you see this, we caught it (but we won't).");
         }
     }
+
+
+
+
+
+
+
+
+
 
     async void AsyncVoidThatThrows()
     {
         throw new Exception("Boom");
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /// <summary>
     /// Because this call is not awaited, execution of the current method continues before
@@ -246,26 +335,72 @@ public class Menu : MonoBehaviour
         LogAsync("Nice weather today");
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     async Task LogAsync(string message)
     {
         await Task.Delay(TimeSpan.FromSeconds(1));
         Debug.Log($"Delayed message: {message}");
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /// <summary>
     /// Task.Run queues the specified work to run on the ThreadPool and returns a Task for that work.
     /// </summary>
     void Example_TaskRun()
     {
-        // This will be executed on a different thread than...
+        // This will run on Unity's main thread.
         ThreadIdLogger.Log("Before Task.Run");
 
         Task.Run(() =>
         {
-            // ...this.
+            // But this will run on a different thread.
+            // You can NOT access Unity from here.
             ThreadIdLogger.Log("Inside Task.Run");
         });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /// <summary>
     /// ContinueWith creates a continuation that executes asynchronously when the target Task completes.
@@ -275,13 +410,58 @@ public class Menu : MonoBehaviour
     /// </summary>
     void Example_ContinueWith()
     {
+        // This will run on Unity's main thread.
         ThreadIdLogger.Log("Before");
 
-        Task.Delay(100).ContinueWith(task =>
+        DoSomethingAsync().ContinueWith(task =>
         {
-            ThreadIdLogger.Log("After");
+            // But this will run on a different thread.
+            // You can NOT access Unity from here.
+            ThreadIdLogger.Log("After ContinueWith");
         });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void Example_ContinueWithTaskSchedulerFromSynchronizationContext()
+    {
+        // This will run on Unity's main thread.
+        ThreadIdLogger.Log("Before");
+
+        DoSomethingAsync().ContinueWith(task =>
+        {
+            // But this will run on a different thread.
+            // You CAN access Unity from here.
+            ThreadIdLogger.Log("After ContinueWith");
+        }, TaskScheduler.FromCurrentSynchronizationContext());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     void Example_CancellationToken()
     {
@@ -298,7 +478,7 @@ public class Menu : MonoBehaviour
 
         // Pass the token returned by the CancellationTokenSource.Token property to each task or thread
         // that listens for cancellation.
-        PrintMessagesUntilCanceledAsync(cancellationTokenSource.Token).ReportErrors();
+        PrintMessagesUntilCanceledAsync(cancellationTokenSource.Token);
 
         // Continue reading...
     }
@@ -311,7 +491,7 @@ public class Menu : MonoBehaviour
         // your application logic.
         while (!token.IsCancellationRequested)
         {
-            Debug.Log("Hello");
+            Debug.Log("Are we there yet?");
             await Task.Delay(TimeSpan.FromSeconds(1), token);
         }
 
@@ -329,7 +509,66 @@ public class Menu : MonoBehaviour
         cancellationTokenSource.Dispose();
     }
 
-    async void Example_OverheadValueTask()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async Task Example_OverheadTask()
+    {
+        var stopwatch = Stopwatch.StartNew();
+        int total = 0;
+
+        for (int i = 0; i < 1_000_000; i++)
+        {
+            int value = await GetValueUsingTaskAsync();
+            total += value;
+        }
+
+        Debug.Log($"Task finished in {stopwatch.ElapsedMilliseconds} ms with value {total}.");
+    }
+
+    Task<int> GetValueUsingTaskAsync()
+    {
+        return Task.FromResult(1337);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async Task Example_OverheadValueTask()
     {
         var stopwatch = Stopwatch.StartNew();
         int total = 0;
@@ -348,24 +587,28 @@ public class Menu : MonoBehaviour
         return new ValueTask<int>(1337);
     }
 
-    async void Example_OverheadTask()
-    {
-        var stopwatch = Stopwatch.StartNew();
-        int total = 0;
 
-        for (int i = 0; i < 1_000_000; i++)
-        {
-            int value = await GetValueUsingTaskAsync();
-            total += value;
-        }
 
-        Debug.Log($"Task finished in {stopwatch.ElapsedMilliseconds} ms with value {total}.");
-    }
 
-    Task<int> GetValueUsingTaskAsync()
-    {
-        return Task.FromResult(1337);
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     void Example_OverheadJobSystem()
     {
@@ -404,7 +647,24 @@ public class Menu : MonoBehaviour
         return value;
     }
 
-    async void Example_GrandpasOldSystemWithCallbacks()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async Task Example_GrandpasOldSystemWithCallbacks()
     {
         GrandpasOldSystem.FetchMessage(
             successCallback: (message) =>
@@ -427,7 +687,22 @@ public class Menu : MonoBehaviour
         );
     }
 
-    async void Example_ModernFacadeOnGrandpasOldSystem()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async Task Example_ModernFacadeOnGrandpasOldSystem()
     {
         try
         {
@@ -440,4 +715,67 @@ public class Menu : MonoBehaviour
             Debug.LogException(e);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /// <summary>
+    /// Fetch color from backend, takes 1 second.
+    /// </summary>
+    Color FetchColorFromBackend()
+    {
+        Thread.Sleep(1000);
+        return Color.green;
+    }
+
+    /// <summary>
+    /// Load a character, takes 1 second.
+    /// </summary>
+    Character LoadCharacter(string type)
+    {
+        Thread.Sleep(1000);
+        return new Character(type);
+    }
+
+    async Task<Color> FetchColorFromBackendAsync()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(1));
+        return Color.green;
+    }
+
+    async Task<Character> LoadCharacterAsync(string type)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(1));
+        return new Character(type);
+    }
+
+
+
+
+
+
+
+
+    async Task DoSomethingAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(100));
+    }
+
+
+
 }

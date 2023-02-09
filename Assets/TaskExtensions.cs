@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class TaskExtensions
 {
-    public static void ReportErrors(this Task task)
+    public static void TrustMeJustLetItRipYo(this Task task)
     {
         task.ContinueWith(t =>
         {

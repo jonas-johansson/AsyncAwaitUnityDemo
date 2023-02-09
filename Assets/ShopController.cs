@@ -10,7 +10,7 @@ public class ShopController : MonoBehaviour
 
     void Start()
     {
-        PopulateShopAsync().ReportErrors();
+        PopulateShopAsync().TrustMeJustLetItRipYo();
     }
 
     async Task PopulateShopAsync()
